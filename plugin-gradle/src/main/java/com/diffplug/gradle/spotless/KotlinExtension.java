@@ -20,6 +20,7 @@ import static com.diffplug.spotless.kotlin.KotlinConstants.LICENSE_HEADER_DELIMI
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
@@ -51,10 +52,12 @@ public class KotlinExtension extends FormatExtension implements HasBuiltinDelimi
 		return licenseHeaderFile(licenseHeaderFile, LICENSE_HEADER_DELIMITER);
 	}
 
-	/** Adds the specified version of [ktlint](https://github.com/pinterest/ktlint). */
+	/**
+	 * Adds the specified version of [ktlint](https://github.com/pinterest/ktlint).
+	 */
 	public KotlinFormatExtension ktlint(String version) {
 		Objects.requireNonNull(version);
-		return new KotlinFormatExtension(version, Collections.emptyMap());
+		return new KotlinFormatExtension(version, Collections.emptyMap(), null);
 	}
 
 	public KotlinFormatExtension ktlint() {
@@ -65,26 +68,45 @@ public class KotlinExtension extends FormatExtension implements HasBuiltinDelimi
 
 		private final String version;
 		private Map<String, String> userData;
+		private String libs;
+		private String maven;
 
-		KotlinFormatExtension(String version, Map<String, String> config) {
+		KotlinFormatExtension(String version, Map<String, String> config, String libs) {
 			this.version = version;
 			this.userData = config;
+			this.libs = libs;
 			addStep(createStep());
 		}
 
-		public void userData(Map<String, String> userData) {
+		public KotlinFormatExtension userData(Map<String, String> userData) {
 			// Copy the map to a sorted map because up-to-date checking is based on binary-equals of the serialized
 			// representation.
 			this.userData = userData;
+			return this;
+		}
+
+		public KotlinFormatExtension libs(String libs) {
+			this.libs = libs;
+			return this;
+		}
+
+		public KotlinFormatExtension mainMaven(String maven) {
+			this.maven = maven;
+			return this;
+		}
+
+		public void replace() {
 			replaceStep(createStep());
 		}
 
 		private FormatterStep createStep() {
-			return KtLintStep.create(version, provisioner(), userData);
+			return KtLintStep.create(version, provisioner(), userData, libs, maven);
 		}
 	}
 
-	/** Uses the [ktfmt](https://github.com/facebookincubator/ktfmt) jar to format source code. */
+	/**
+	 * Uses the [ktfmt](https://github.com/facebookincubator/ktfmt) jar to format source code.
+	 */
 	public KtfmtConfig ktfmt() {
 		return ktfmt(KtfmtStep.defaultVersion());
 	}
@@ -118,7 +140,9 @@ public class KotlinExtension extends FormatExtension implements HasBuiltinDelimi
 		}
 	}
 
-	/** If the user hasn't specified the files yet, we'll assume he/she means all of the kotlin files. */
+	/**
+	 * If the user hasn't specified the files yet, we'll assume he/she means all of the kotlin files.
+	 */
 	@Override
 	protected void setupTask(SpotlessTask task) {
 		if (target == null) {

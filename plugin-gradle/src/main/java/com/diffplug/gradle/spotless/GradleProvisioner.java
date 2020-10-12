@@ -67,7 +67,7 @@ class GradleProvisioner {
 				Dependency[] deps = mavenCoords.stream()
 						.map(project.getBuildscript().getDependencies()::create)
 						.toArray(Dependency[]::new);
-
+				System.out.println("==="+deps);
 				Configuration config = project.getRootProject().getBuildscript().getConfigurations().detachedConfiguration(deps);
 				config.setDescription(mavenCoords.toString());
 				config.setTransitive(withTransitives);
