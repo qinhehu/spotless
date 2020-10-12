@@ -61,13 +61,13 @@ String libVersion = version.endsWith('-SNAPSHOT') ?
 		rootProject.spotlessChangelog.versionNext :
 		rootProject.spotlessChangelog.versionLast
 dependencies {
-	if (version.endsWith('-SNAPSHOT')) {
+//	if (version.endsWith('-SNAPSHOT')) {
 		implementation project(':lib')
 		implementation project(':lib-extra')
-	} else {
-		implementation "com.diffplug.spotless:spotless-lib:${libVersion}"
-		implementation "com.diffplug.spotless:spotless-lib-extra:${libVersion}"
-	}
+//	} else {
+//		implementation "com.diffplug.spotless:spotless-lib:${libVersion}"
+//		implementation "com.diffplug.spotless:spotless-lib-extra:${libVersion}"
+//	}
 
 	implementation "org.codehaus.plexus:plexus-resources:${VER_PLEXUS_RESOURCES}"
 
